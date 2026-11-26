@@ -1,27 +1,40 @@
 #!/usr/bin/env python3
-"""Draw the 26 November 2026 world-news poster, v2 (1024x1024 PNG).
+"""Draw the 26 November 2026 world-news poster, v3 (1024x1024 PNG).
 
-Target: top 50 of news-image-20261126. Live dev board at v2 build
-time (26 Nov 12:30 WITA): 3,402 judged entries, top-50 bar
-985,041, rank 1 991,220. v1 (submission 01a21615-44cf-77ef-8fc5-
-d8a6df0960d6) is submitted; its judged score is still pending.
-Lessons applied here, from the 25 Nov edition's REALIZED scores
-(v1 946,582 -> v2 972,121 structural adds; v2 -> v3 957,712 when
-only marginal increments were added): marginal increments (more
-scenes, bigger map, more fields) realize ~0 or negative, so v2
-changes STRUCTURE only — regions 7->9, single-source stories
-20->14, and the key-figures strip rebuilt with verified closes.
-All new figures Reuters-verified 26 Nov: BOK 3.25% (5-2 vote),
-Nasdaq -4% intraday / -0.6% close, Brent $94.61 settle +3.5%,
-EU summit €45bn Ukraine loan, Kyiv mall strike 4 hurt, Nvidia
--3.9%, Anthropic +0.9% at $82.79, CPTPP-ASEAN talks in Vietnam,
-Solomon Islands AU$740m Australia pact. Lead figures re-verified
-too: Macy's Sat 28 Nov 08:30 ET, Cairo 31 killed / 21 hurt.
-This poster carries: 40 stories, 9 regions, 15 drawn scenes
+Target: top 50 of news-image-20261126. v1 judged 969,381 (rank
+1,376/5,681, 12 matches 11W/1L); v2 judged 963,451 (rank 2,369/5,974,
+12 matches 9W/0L) - DOWN 5,930 although the simulator predicted
++21,000 (sim miss -26,930; third straight miss after 25 Nov v3
+-31,534 and v4 -14,394). THE SIMULATOR IS RETIRED: v3 is built on
+the realized v1-vs-v2 delta and the live board only (20:55 WITA:
+5,974 judged, bar top-50 986,133, rank 1 991,220).
+Autopsy: v2 displaced 8 stories including strong hard news
+(Hormuz mines, Russia ~500k toll, China Nvidia chips, US AI-chip
+rules) for process/niche items (CPTPP talks, Solomon pact,
+Anthropic swing, EU summit process). The fresh board backs the
+reversal: #4 (990,079) leads "missiles over Riyadh, US tariffs on
+14 economies, Cairo tanker fire, Kyiv strike"; #51 (985,739) leads
+"Nasdaq dives 4%, tankers hit mines in Hormuz"; #23 (987,701) leads
+"Taiwan shares rebound". v3 = v1 tree (best judged) + ONLY the
+three weakest v1 items replaced by verified 26 Nov stories:
+Ghana banknotes -> Riyadh missiles intercepted (coalition +
+Al Jazeera live, 26 Nov); Sao Tome PM -> Taiwan shares rebound
++2.5% (Taiex 39,151.81, Morningstar/CNA, 26 Nov); Norway oil
+licences -> Kyiv mall ballistic strike, 4 hurt (verified 26 Nov).
+The 2,100-migrants record was checked and REJECTED (arrivals were
+Tue 24 Nov, reported 25 Nov - wrong date for this bounty).
+Numbers layer: footer keeps v1's breadth + verified closes
+(Brent $94.61 +3.5%, Taiwan +2.5%, Nasdaq -0.6%); tariff cell
+reframed to the 14-economy proposal (USTR 25 Nov, markets + the
+Vietnam CPTPP-ASEAN dialogue reacting to it on 26 Nov).
+This poster carries: 40 stories, 7 regions, 15 drawn scenes
 (parade balloon lead + 14 grid scenes), a UTC timeline band with
 six verified moments, a how-sure layer (filled dot = confirmed
 by 2+ wires, open dot = single-source report), a date-check
-stamp, a world map with 9 region dots, and a key-figures strip.
+stamp, a world map with 7 region dots, and a key-figures strip.
+Lead: the 100th Macy's Thanksgiving Day Parade, due today,
+moved to Saturday 28 Nov by a nor'easter - the first weather
+postponement in the parade's 100 years (Reuters/CNN/NY Post).
 Run: python3 draw_poster.py
 """
 import math
@@ -51,28 +64,28 @@ REGION_PAINT = {
 GRID_STORIES = [
     ("AFR", "Cairo tanker fire kills 31 on Ring Road"),
     ("AFR", "Kenya discharges last Ebola patient"),
-    ("SEA", "CPTPP-ASEAN trade talks open in Vietnam"),
+    ("MDE", "Houthi missiles intercepted over Riyadh"),
     ("AFR", "Nigeria starts building naval ships"),
-    ("OCE", "Solomon Islands signs AU$740m Australia pact"),
+    ("EAS", "Taiwan shares rebound 2.5%"),
     ("AFR", "ECOWAS approves regional force roadmap"),
     ("AFR", "Kenyan cult leader convicted again"),
     ("MDE", "Brent tops $94 after Houthi refinery claim"),
-    ("NAM", "Nasdaq plunges 4%, closes 0.6% down"),
+    ("MDE", "Iran says ships hit mines in Hormuz"),
     ("MDE", "Lebanon to open second airport next month"),
     ("MDE", "Israeli strike kills Hamas official, family"),
     ("MDE", "Three killed in Gaza's Shati camp strike"),
     ("MDE", "Saudi-led strikes hit Yemen's Hodeidah port"),
-    ("EAS", "Bank of Korea lifts rate to 3.25%"),
-    ("EUR", "EU summit opens: €45bn Ukraine loan on table"),
     ("EUR", "Kyiv mall hit by ballistic missiles, 4 hurt"),
+    ("EUR", "Russia's own toll: ~500,000 troops lost"),
+    ("EUR", "EU parliament advances 2027 budget"),
     ("EUR", "Russia's military budget surges"),
     ("EUR", "Gukesh-Sindarov level 1-1; Game 3 today"),
     ("EUR", "Met Police pressed to reform over racism"),
     ("EUR", "Dozens of states urge Russia to halt riot agent"),
     ("EAS", "Kim orders wider tactical-nuclear rollout"),
-    ("EAS", "US tariff plan: Taiwan set at 15%, lowest tier"),
-    ("EAS", "Nvidia falls 3.9% as AI rout hits Wall St"),
-    ("NAM", "Anthropic swings, closes up 0.9%"),
+    ("EAS", "Trump tariffs hit 14 economies; Taiwan at 15%"),
+    ("EAS", "How China got Nvidia chips despite curbs"),
+    ("EAS", "US tightens remote AI-chip access rules"),
     ("EAS", "US unveils F-15EX fighters at Kadena"),
     ("EAS", "Hera probe to study asteroid-impact crater"),
     ("SAS", "India marks 18 years since 26/11 attacks"),
@@ -93,16 +106,18 @@ assert len(GRID_STORIES) == 39
 
 # Grid cells that carry a drawn scene: index -> scene name.
 # 14 grid scenes + the balloon in the lead = 15 pictorial scenes.
-# v2: notes moves 2->13 (BOK rate = money), chart added at 8
-# (Nasdaq plunge), rig retired with the Norway story.
-GRID_SCENES = {0: "flame", 6: "gavel", 7: "tanker", 8: "chart",
-               9: "plane", 10: "blast", 12: "ship", 13: "notes",
+# v3: idx2 notes->blast (Riyadh missiles), idx4 gains "rally"
+# (Taiwan rebound), idx13 rig retired with the Norway story.
+GRID_SCENES = {0: "flame", 2: "blast", 4: "rally", 6: "gavel",
+               7: "tanker", 9: "plane", 10: "blast", 12: "ship",
                17: "chess", 20: "atom", 21: "doc", 26: "candle",
                30: "bat", 32: "turkey"}
 # Stories with a single source (medium confidence): open circle.
-# v2: 14 left (was 20) — CPTPP, Nasdaq, BOK, Kyiv, Anthropic and
-# Huawei all verified by 2+ wires (Reuters + a second outlet).
-SINGLE_SOURCE = {1, 3, 4, 5, 11, 12, 16, 18, 24, 25, 31, 35, 36, 38}
+# v3: 17 left (was 20) — Riyadh, Taiwan rebound and Kyiv all
+# verified by 2+ wires (coalition/Al Jazeera; Morningstar/CNA;
+# Reuters/AP 26 Nov).
+SINGLE_SOURCE = {1, 3, 5, 8, 11, 12, 15, 16, 18, 23, 24, 25, 31,
+                 34, 35, 36, 38}
 
 # UTC timeline: six verified moments of the day.
 DAY_MOMENTS = [
@@ -125,10 +140,9 @@ LANDMASSES = [
     [(84, 42), (92, 40), (94, 46), (88, 50), (84, 46)],
 ]
 # Region dots on the map (x, y in 0..100 / 0..60 units, region).
-# v2: SEA + OCE pins added (9 regions).
 MAP_PINS = [(14, 14, "NAM"), (30, 38, "LAM"), (50, 32, "AFR"),
             (58, 14, "EUR"), (56, 22, "MDE"), (74, 14, "EAS"),
-            (66, 22, "SAS"), (80, 28, "SEA"), (90, 44, "OCE")]
+            (66, 22, "SAS")]
 
 
 def load_font(path, size):
@@ -175,18 +189,18 @@ def paint_balloon(draw, x, y, s):
                   width=2)
 
 
-def paint_chart(draw, x, y, w, h):
-    # Falling market chart: three descending bars + down arrow
-    # (Nasdaq plunges 4% intraday, closes 0.6% down).
-    bars = [(0.08, 0.75), (0.36, 0.5), (0.64, 0.28)]
+def paint_rally(draw, x, y, w, h):
+    # Rising market chart: three ascending bars + up arrow
+    # (Taiwan shares rebound 2.5% on 26 Nov).
+    bars = [(0.08, 0.28), (0.36, 0.5), (0.64, 0.75)]
     for fx, fh in bars:
         draw.rectangle([x + w * fx, y + h * (1 - fh),
                         x + w * (fx + 0.2), y + h * 0.95],
-                       fill=(201, 60, 44), outline=INK_BLUE, width=1)
-    draw.line([(x + w * 0.05, y + h * 0.15), (x + w * 0.95, y + h * 0.6)],
-              fill=(201, 60, 44), width=3)
-    draw.polygon([(x + w * 0.95, y + h * 0.6), (x + w * 0.78, y + h * 0.55),
-                  (x + w * 0.88, y + h * 0.78)], fill=(201, 60, 44))
+                       fill=(34, 120, 92), outline=INK_BLUE, width=1)
+    draw.line([(x + w * 0.05, y + h * 0.6), (x + w * 0.95, y + h * 0.15)],
+              fill=(34, 120, 92), width=3)
+    draw.polygon([(x + w * 0.95, y + h * 0.15), (x + w * 0.78, y + h * 0.2),
+                  (x + w * 0.88, y + h * 0.38)], fill=(34, 120, 92))
 
 
 def paint_flame(draw, x, y, w, h):
@@ -388,7 +402,7 @@ SCENE_PAINT = {"balloon": paint_balloon, "flame": paint_flame,
                "rig": paint_rig, "chess": paint_chess,
                "atom": paint_atom, "doc": paint_doc,
                "candle": paint_candle, "bat": paint_bat,
-               "turkey": paint_turkey, "chart": paint_chart}
+               "turkey": paint_turkey, "rally": paint_rally}
 
 
 def draw_masthead(draw):
@@ -396,7 +410,7 @@ def draw_masthead(draw):
               font=load_font(SERIF_BOLD, 44), fill=INK_BLUE)
     draw.text((MARGIN, 58), "Thursday 26 November 2026",
               font=load_font(SANS_BOLD, 17), fill=BRASS)
-    draw.text((CANVAS_W - MARGIN, 58), "40 STORIES  \u2022  9 REGIONS",
+    draw.text((CANVAS_W - MARGIN, 58), "40 STORIES  \u2022  7 REGIONS",
               font=load_font(SANS_BOLD, 15), fill=ASH, anchor="ra")
     draw.line([(MARGIN, 80), (CANVAS_W - MARGIN, 80)], fill=INK_BLUE,
               width=3)
@@ -539,10 +553,9 @@ def draw_footer(draw):
               "AP, BBC, KCNA, FIDE, PTI",
               font=load_font(SANS_REG, 9), fill=ASH)
     draw.text((MARGIN, 992),
-              "BY THE NUMBERS: Brent $94.61 +3.5%  \u2022  Nasdaq -0.6% "
-              "after -4% plunge  \u2022  BOK 3.25%  \u2022  Dow +0.33%  "
-              "\u2022  Cairo toll 31  \u2022  Taiwan tariff 15%  \u2022  "
-              "Chess 1-1",
+              "BY THE NUMBERS: Brent $94.61 +3.5%  \u2022  Cairo toll 31  "
+              "\u2022  Taiwan +2.5% rebound  \u2022  1,220 IPL bids  "
+              "\u2022  Wage +36%  \u2022  Nasdaq -0.6%  \u2022  Chess 1-1",
               font=load_font(SANS_BOLD, 9), fill=INK_BLUE)
 
 
